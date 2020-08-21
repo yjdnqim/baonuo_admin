@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AdMapper">
+	
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="pd">
+		insert into TB_AD(
+			NAME,	
+			TYPE,	
+			IMG_URL,	
+			LINK,	
+			SORT,	
+			START_TIME,	
+			END_TIME,	
+			EXT_FIELD_1,	
+			EXT_FIELD_2,	
+			EXT_FIELD_3,	
+			CREATE_TIME,	
+			EDIT_TIME,	
+			OPTION_PERSON,	
+			IS_DELETED,	
+			AD_ID
+		) values (
+			#{NAME},	
+			#{TYPE},	
+			#{IMG_URL},	
+			#{LINK},	
+			#{SORT},	
+			#{START_TIME},	
+			#{END_TIME},	
+			#{EXT_FIELD_1},	
+			#{EXT_FIELD_2},	
+			#{EXT_FIELD_3},	
+			#{CREATE_TIME},	
+			#{EDIT_TIME},	
+			#{OPTION_PERSON},	
+			#{IS_DELETED},	
+			#{AD_ID}
+		)
+	</insert>
+	
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		update  TB_AD
+		set
+			IS_DELETED = 1
+		where 
+			AD_ID = #{AD_ID}
+	</delete>
+	
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  TB_AD
+			set 
+				NAME = #{NAME},
+				TYPE = #{TYPE},
+				IMG_URL = #{IMG_URL},
+				LINK = #{LINK},
+				SORT = #{SORT},
+				START_TIME = #{START_TIME},
+				END_TIME = #{END_TIME},
+				EDIT_TIME = #{EDIT_TIME},
+			AD_ID = AD_ID
+			where 
+				AD_ID = #{AD_ID}
+	</update>
+	
+	
+	<!-- 通过ID获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			NAME,	
+			TYPE,	
+			IMG_URL,	
+			LINK,	
+			SORT,	
+			START_TIME,	
+			END_TIME,	
+			EXT_FIELD_1,	
+			EXT_FIELD_2,	
+			EXT_FIELD_3,	
+			CREATE_TIME,	
+			EDIT_TIME,	
+			OPTION_PERSON,	
+			IS_DELETED,	
+			AD_ID
+		from 
+			TB_AD
+		where 
+			AD_ID = #{AD_ID}
+	</select>
+	
+	
+	<!-- 列表 -->
+	<select id="datalistPage" parameterType="page" resultType="pd">
+		select
+			a.NAME,
+			a.TYPE,
+			a.IMG_URL,
+			a.LINK,
+			a.SORT,
+			a.START_TIME,
+			a.END_TIME,
+			a.EXT_FIELD_1,
+			a.EXT_FIELD_2,
+			a.EXT_FIELD_3,
+			a.CREATE_TIME,
+			a.EDIT_TIME,
+			a.OPTION_PERSON,
+			a.IS_DELETED,
+			a.AD_ID
+		from 
+			TB_AD a
+		where
+			a.IS_DELETED = 0
+		<if test="pd.TYPE != null and pd.TYPE != ''">
+			and a.TYPE = #{pd.TYPE}
+		</if>
+		<if test='pd.IS_INVALID == "0"'>
+			and a.END_TIME >= #{pd.CURRENT_TIME}
+		</if>
+		<if test='pd.IS_INVALID == "1"'>
+			and a.END_TIME &lt; #{pd.CURRENT_TIME}
+		</if>
+		order by a.CREATE_TIME desc
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+			a.NAME,
+			a.TYPE,
+			a.IMG_URL,
+			a.LINK,
+			a.SORT,
+			a.START_TIME,
+			a.END_TIME,
+			a.EXT_FIELD_1,
+			a.EXT_FIELD_2,
+			a.EXT_FIELD_3,
+			a.CREATE_TIME,
+			a.EDIT_TIME,
+			a.OPTION_PERSON,
+			a.IS_DELETED,
+			a.AD_ID
+		from 
+			TB_AD a
+		where
+			a.IS_DELETED = 0
+		<if test="TYPE != null and TYPE != ''">
+			and a.TYPE = #{TYPE}
+		</if>
+		<if test='IS_INVALID == "0"'>
+			and a.END_TIME >= #{CURRENT_TIME}
+		</if>
+		<if test='IS_INVALID == "1"'>
+			and a.END_TIME &lt; #{CURRENT_TIME}
+		</if>
+		order by a.CREATE_TIME desc
+	</select>
+
+	<!-- for api -->
+	<select id="api_getAdList" parameterType="pd" resultType="pd">
+		select
+		a.NAME,
+		a.TYPE,
+		a.IMG_URL,
+		a.LINK,
+		a.AD_ID
+		from
+		TB_AD a
+		where
+		a.IS_DELETED = 0
+		<if test="TYPE != null and TYPE != ''">
+			and a.TYPE = #{TYPE}
+		</if>
+		<if test='IS_INVALID == "0"'>
+			and a.END_TIME >= #{CURRENT_TIME}
+		</if>
+		<if test='IS_INVALID == "1"'>
+			and a.END_TIME &lt; #{CURRENT_TIME}
+		</if>
+		order by a.SORT asc
+	</select>
+	
+	<!-- 批量删除 -->
+	<delete id="deleteAll" parameterType="String">
+		update  TB_AD
+			set
+			IS_DELETED = 1
+		where 
+			AD_ID in
+		<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+                 #{item}
+		</foreach>
+	</delete>
+	
+</mapper>
